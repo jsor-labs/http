@@ -811,6 +811,7 @@ or use a class based approach to ease using existing middleware implementations.
 In order to use middleware request handlers, simply pass an array with all
 callables as defined above to the [`Server`](#server) or
 [`StreamingServer`](#streamingserver) respectively.
+
 The following example adds a middleware request handler that adds the current time to the request as a 
 header (`Request-Time`) and a final request handler that always returns a 200 code without a body: 
 
@@ -825,6 +826,48 @@ $server = new Server(array(
     },
 ));
 ```
+
+It is possible to break the middleware chain by explicitly returning a 
+`ResponseInterface`. In this case, the remaining middleware request handlers
+will not be executed:
+
+```php
+$server = new Server(array(
+    function (ServerRequestInterface $request, callable $next) {
+        if (/* Some authorization check */) {
+            // This breaks the middleware chain
+            return new Response(403);
+        }
+
+        return $next($request);
+    },
+    function (ServerRequestInterface $request, callable $next) {
+        return new Response(200);
+    },
+));
+```
+
+If access to the response is needed, it is possible to delegate creating the
+response to the middleware chain and subscribe to the promise returned by
+`$next()`:
+
+```php
+$server = new Server(array(
+    function (ServerRequestInterface $request, callable $next) {
+        $promise = $next($request);
+
+        return $promise->then(function (ResponseInterface $response) {
+            return $response->withHeader('X-Powered-By', 'AwesomeApp 1.0');
+        });
+    },
+    function (ServerRequestInterface $request, callable $next) {
+        return new Response(200);
+    },
+));
+```
+
+> Note that `$next()` **always** returns a promise resolving to a
+  `ResponseInterface`.
 
 While this project does provide the means to *use* middleware implementations,
 it does not aim to *define* how middleware implementations should look like.
