@@ -808,14 +808,6 @@ functions or any classes that use the magic `__invoke()` method.
 This allows you to easily create custom middleware request handlers on the fly
 or use a class based approach to ease using existing middleware implementations.
 
-While this project does provide the means to *use* middleware implementations,
-it does not aim to *define* how middleware implementations should look like.
-We realize that there's a vivid ecosystem of middleware implementations and
-ongoing effort to standardize interfaces between these and support this goal.
-As such, this project only bundles a few middleware implementations that are
-required to match PHP's request behavior (see below) and otherwise actively
-encourages [Third-Party Middleware](#third-party-middleware) implementations.
-
 In order to use middleware request handlers, simply pass an array with all
 callables as defined above to the [`Server`](#server) or
 [`StreamingServer`](#streamingserver) respectively.
@@ -833,6 +825,14 @@ $server = new Server(array(
     },
 ));
 ```
+
+While this project does provide the means to *use* middleware implementations,
+it does not aim to *define* how middleware implementations should look like.
+We realize that there's a vivid ecosystem of middleware implementations and
+ongoing effort to standardize interfaces between these and support this goal.
+As such, this project only bundles a few middleware implementations that are
+required to match PHP's request behavior (see below) and otherwise actively
+encourages [Third-Party Middleware](#third-party-middleware) implementations.
 
 #### LimitConcurrentRequestsMiddleware
 
